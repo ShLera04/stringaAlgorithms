@@ -1,0 +1,68 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+std::vector<int> prefix(const std::string& str) {
+    int size = str.length();
+    std::vector<int> pi(size);
+
+    for (int first = 1; first < size; ++first) {
+        int second = pi[first - 1];
+        while (second > 0 && str[first] != str[second]) {
+            second = pi[second - 1];
+        }
+        if (str[first] == str[second]) {
+            ++second;
+        }
+        pi[first] = second;
+    }
+    return pi;
+}
+
+std::string reconstructFromZ(const std::vector<int>& zFunc) {
+    int size = zFunc.size();
+    std::string str(size, 'a');
+
+    int left = 0, right = 0;
+    char nextChar = 'b';
+
+    for (int first = 1; first < size; ++first) {
+        if (first < right) {
+            str[first] = str[first-1];
+        }
+        if (first + zFunc[first] > right) {
+            for (int second = std::max(0, right - first); second <zFunc[first] && first + second < size; ++second) {
+                str[first + second] = str[second];
+            }
+            left = first;
+            right = first + zFunc[first];
+        }
+        if (zFunc[first] == 0 && str[first] == str[0]) {
+            str[first] = nextChar++;
+        }
+    }
+    return str;
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    int size;
+    std::cin >> size;
+    std::vector<int> zFunc(size);
+     for (int index = 0; index < size; ++index) {
+        std::cin >> zFunc[index];
+    }
+
+    std::string str = reconstructFromZ(zFunc);
+    std::vector<int> pi = prefix(str);
+
+    for (int index = 0; index < size; ++index) {
+        if (index > 0) std::cout << " ";
+        std::cout << pi[index];
+    }
+    std::cout<< "\n";
+
+    return 0;
+}
